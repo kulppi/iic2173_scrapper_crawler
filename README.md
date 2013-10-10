@@ -21,7 +21,6 @@ npm install simplecrawler
 # Crear carpetas recursivamente y manejo de archivos:
 npm install node-fs 
 npm install wrench  
-
 ```
 
 ### Scrapper
@@ -36,7 +35,6 @@ Necesita Python 3.3 and  beautifulsoup4-4.3.1.
 ```bash
 # iniciar
 node movie-crawler.js 
-
 ```
 
 ### Scrapper
