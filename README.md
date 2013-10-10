@@ -12,10 +12,10 @@ This app supports deploying to DCC server system, and a demo is in fact running 
 
 ### Crawler
 
-Se basa en [https://github.com/cgiffard/node-simplecrawler](https://github.com/cgiffard/node-simplecrawler)
+Se basa en [https://github.com/cgiffard/node-simplecrawler](https://github.com/cgiffard/node-simplecrawler) y necesita tener instalado MongoDB
 
 ```bash
-# para un seteo básico necesita (necesita despendencias de MongoDB)
+# para un seteo básico necesita 
 npm install simplecrawler 
 
 # Crear carpetas recursivamente y manejo de archivos:
