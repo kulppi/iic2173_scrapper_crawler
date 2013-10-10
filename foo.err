@@ -1,0 +1,12 @@
+
+/home/grupo1/movie-crawler.js:30
+     db.crawlercollection.save({url:queueItem.url, html:responseBuffer});
+                          ^
+TypeError: Cannot call method 'save' of undefined
+    at null.<anonymous> (/home/grupo1/movie-crawler.js:30:27)
+    at EventEmitter.emit (events.js:106:17)
+    at processReceivedData (/home/grupo1/node_modules/simplecrawler/lib/crawler.js:846:11)
+    at IncomingMessage.receiveData (/home/grupo1/node_modules/simplecrawler/lib/crawler.js:918:4)
+    at IncomingMessage.EventEmitter.emit (events.js:117:20)
+    at _stream_readable.js:920:16
+    at process._tickCallback (node.js:415:13)

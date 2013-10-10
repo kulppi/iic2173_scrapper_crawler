@@ -1,0 +1,45 @@
+show dbs
+use local
+show dbs
+use crawlerdb
+db.crawlercollection.find().count()
+use crawlerdb
+db.crawlercollection.find().count()
+db.crawlercollection.find()
+use crawlerdb
+db.dropDatabase()
+show dbs
+use crawler
+db.crawlercollection.find().count()
+use crawler
+show dbs
+use crawlerdb
+db.crawlercollection.find().count()
+use crawlerdb
+db.dropDatabase()
+show dbs
+use crawler
+db.dropDatabase()
+show dbs
+show dbs
+show dbs
+show dbs
+show dbs
+show dbs
+use crawlerdb
+db.crawlercollection.find().count()
+show dbs
+db.crawlercollection.find().count()
+show dbs
+use crawlerdb
+db.crawlercollection.find().count()
+show dbs
+use crawlerdb
+db.crawlercollection.find().count()
+db.crawlercollection.find().count()
+show dbs
+use crawlerdb
+db.crawlercollection.find().count()
+db.crawlercollection.find().count()
+use crawlerdb
+db.crawlercollection.find().count()
