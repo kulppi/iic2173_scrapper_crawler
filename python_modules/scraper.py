@@ -64,7 +64,8 @@ def ScrapingRottenTomatoes(html, scrapercollection):
 def main():
 	client = MongoClient()
 	db = client.crawlerdb
-	crawlercollection = db.crawlercollection
+	#crawlercollection = db.crawlercollection
+	crawlercollection = db.mycollection
 	scrapercollection = db.scrapercollection
 	while True:
 		#path = input("Ingrese URL: ")
@@ -74,9 +75,7 @@ def main():
 				if not "showtimes" in document["url"] and not "reviews" in document["url"]:
 					if "imdb" in document["url"]:
 						ScrapingIMDB(document["html"], scrapercollection)
-						print("imdb")
-					elif "rottentomatoes" in path:
-						print("rotten")
+					elif "rottentomatoes" in document["url"]:
 						ScrapingRottenTomatoes(document["html"], scrapercollection)	
 			except:
 				document["invalid"] = True
