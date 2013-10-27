@@ -1,43 +1,50 @@
-from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
 from pymongo import MongoClient
 import time
 
 def ScrapingIMDB(html, scrapercollection):
-	#req = Request(path, headers={'User-Agent': 'Mozilla/5.0'})
-	page = html #urlopen(req).read()
-	soup = BeautifulSoup(BeautifulSoup(page).prettify())
-	titleTag = soup.find("span", {"class": "title-extra"})
+	soup = BeautifulSoup(BeautifulSoup(html).prettify())
+	if soup.find("span", {"class": "title-extra"}):
+		titleTag = soup.find("span", {"class": "title-extra"})
+	else:
+		error = True
 	if not titleTag and soup.find("h1", {"class": "header"}).find_all("span"):
 		titleTag = soup.find("h1", {"class": "header"}).find_all("span")[0]
 	if titleTag:
-		titleAux = titleTag.contents[0].strip()
-		title = titleAux.replace('\"','')
+		title = titleTag.contents[0].strip().replace('\"','')
 	else:
-		title = "No title"
-	year = soup.find("h1", {"class": "header"}).find("a")
-	cast = soup.find("table", {"class": "cast_list"}).find_all(itemprop="actor")
-	genres = soup.find("div", {"class": "infobar"}).find_all(itemprop="genre")
-	synopsis = soup.find("div",{"id": "titleStoryLine"}).find("div",{"itemprop":"description"}).find("p")
-	rating = soup.find("div",{"class": "star-box-giga-star"})
-	if not rating:
-		rating = "No rating"
+		error = True
+	if soup.find("h1", {"class": "header"}).find("a"):
+		year = soup.find("h1", {"class": "header"}).find("a").contents[0].strip()
 	else:
-		rating = rating.contents[0].strip()
+		error = True
+	if soup.find("table", {"class": "cast_list"}).find_all(itemprop="actor"):
+		cast = soup.find("table", {"class": "cast_list"}).find_all(itemprop="actor")
+	else:
+		error = True
+	if soup.find("div", {"class": "infobar"}).find_all(itemprop="genre"):
+		genres = soup.find("div", {"class": "infobar"}).find_all(itemprop="genre")
+	else:
+		error = True
+	if soup.find("div",{"id": "titleStoryLine"}).find("div",{"itemprop":"description"}).find("p"):
+		synopsis = soup.find("div",{"id": "titleStoryLine"}).find("div",{"itemprop":"description"}).find("p").contents[0].strip()
+	else:
+		error = True
+	if soup.find("div",{"class": "star-box-giga-star"}):
+		rating = soup.find("div",{"class": "star-box-giga-star"}).contents[0].strip()
+	else:
+		error = True
 	generos = []
 	for genre in genres:
-	    generos.append( genre.contents[0].strip())
+	    generos.append(genre.contents[0].strip())
 	actores = []
 	for actor in cast:
 	    actores.append(actor.a.span.contents[0].strip())
-	movie = {"Title": title, "Year": year.contents[0].strip(), "Rating IMBD": rating, "Genres": generos, "Synopsis IMDB": synopsis.contents[0].strip(), "Cast": actores, "Site" : 0}
-	movie = {"Title": title, "Year": year.contents[0].strip(), "Rating IMBD": rating, "Genres": generos, "Synopsis IMDB": synopsis.contents[0].strip(), "Cast": actores, "Site" : 0}
+	movie = {"Title": title, "Year": year, "Rating": rating, "Genres": generos, "Synopsis": synopsis, "Cast": actores, "Site" : 'IMDB'}
 	scrapercollection.insert(movie)
 
 def ScrapingRottenTomatoes(html, scrapercollection):
-	#req = Request(path, headers={'User-Agent': 'Mozilla/5.0'})
-	page = html  #urlopen(req).read()
-	soup = BeautifulSoup(BeautifulSoup(page).prettify())
+	soup = BeautifulSoup(BeautifulSoup(html).prettify())
 	titleTag = soup.find("span", {"itemprop": "name"})
 	if not titleTag:
 	    titleTag = soup.find("h1", {"class": "movie_title"}).find_all("span")[0]
@@ -68,7 +75,6 @@ def main():
 	crawlercollection = db.mycollection
 	scrapercollection = db.scrapercollection
 	while True:
-		#path = input("Ingrese URL: ")
 		document = crawlercollection.find_one({"read" : None})
 		if document:
 			try:
