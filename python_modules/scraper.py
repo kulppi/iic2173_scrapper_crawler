@@ -2,46 +2,59 @@ from bs4 import BeautifulSoup
 from pymongo import MongoClient
 import time
 
-def ScrapingIMDB(html, scrapercollection):
+def ScrapingIMDB(html, scrapercollection, url):
+	error = False
 	soup = BeautifulSoup(BeautifulSoup(html).prettify())
-	if soup.find("span", {"class": "title-extra"}):
-		titleTag = soup.find("span", {"class": "title-extra"})
-	else:
-		error = True
+	titleTag = soup.find("span", {"class": "title-extra"})
 	if not titleTag and soup.find("h1", {"class": "header"}).find_all("span"):
 		titleTag = soup.find("h1", {"class": "header"}).find_all("span")[0]
 	if titleTag:
 		title = titleTag.contents[0].strip().replace('\"','')
 	else:
 		error = True
-	if soup.find("h1", {"class": "header"}).find("a"):
-		year = soup.find("h1", {"class": "header"}).find("a").contents[0].strip()
+	if not error:	
+		if soup.find("h1", {"class": "header"}).find("a"):
+			year = soup.find("h1", {"class": "header"}).find("a").contents[0].strip()
+		else:
+			error = True
+		if not error:
+			if soup.find("table", {"class": "cast_list"}).find_all(itemprop="actor"):
+				cast = soup.find("table", {"class": "cast_list"}).find_all(itemprop="actor")
+			else:
+				error = True
+			if not error:
+				if soup.find("div", {"class": "infobar"}).find_all(itemprop="genre"):
+					genres = soup.find("div", {"class": "infobar"}).find_all(itemprop="genre")
+				else:
+					error = True
+				if not error:
+					if soup.find("div",{"id": "titleStoryLine"}).find("div",{"itemprop":"description"}).find("p"):
+						synopsis = soup.find("div",{"id": "titleStoryLine"}).find("div",{"itemprop":"description"}).find("p").contents[0].strip()
+					else:
+						error = True
+					if not error:
+						if soup.find("div",{"class": "star-box-giga-star"}):
+							rating = soup.find("div",{"class": "star-box-giga-star"}).contents[0].strip()
+						else:
+							error = True
+						if not error:
+							if soup.find("div", {"class": "image"}):
+								image = soup.find("div", {"class": "image"})['src']
+							else:
+								error = True
+							if not error:
+								generos = []
+								for genre in genres:
+									generos.append(genre.contents[0].strip())
+								actores = []
+								for actor in cast:
+									actores.append(actor.a.span.contents[0].strip())
+								movie = {"Title": title, "Year": year, "Rating": rating, "Genres": generos, "Synopsis": synopsis, "Cast": actores, "Site" : 'IMDB', "Image" : image, "URL" : url}
+								scrapercollection.insert(movie)
+	if error:
+		return False
 	else:
-		error = True
-	if soup.find("table", {"class": "cast_list"}).find_all(itemprop="actor"):
-		cast = soup.find("table", {"class": "cast_list"}).find_all(itemprop="actor")
-	else:
-		error = True
-	if soup.find("div", {"class": "infobar"}).find_all(itemprop="genre"):
-		genres = soup.find("div", {"class": "infobar"}).find_all(itemprop="genre")
-	else:
-		error = True
-	if soup.find("div",{"id": "titleStoryLine"}).find("div",{"itemprop":"description"}).find("p"):
-		synopsis = soup.find("div",{"id": "titleStoryLine"}).find("div",{"itemprop":"description"}).find("p").contents[0].strip()
-	else:
-		error = True
-	if soup.find("div",{"class": "star-box-giga-star"}):
-		rating = soup.find("div",{"class": "star-box-giga-star"}).contents[0].strip()
-	else:
-		error = True
-	generos = []
-	for genre in genres:
-	    generos.append(genre.contents[0].strip())
-	actores = []
-	for actor in cast:
-	    actores.append(actor.a.span.contents[0].strip())
-	movie = {"Title": title, "Year": year, "Rating": rating, "Genres": generos, "Synopsis": synopsis, "Cast": actores, "Site" : 'IMDB'}
-	scrapercollection.insert(movie)
+		return True
 
 def ScrapingRottenTomatoes(html, scrapercollection):
 	soup = BeautifulSoup(BeautifulSoup(html).prettify())
@@ -80,7 +93,7 @@ def main():
 			try:
 				if not "showtimes" in document["url"] and not "reviews" in document["url"]:
 					if "imdb" in document["url"]:
-						ScrapingIMDB(document["html"], scrapercollection)
+						ScrapingIMDB(document["html"], scrapercollection, document["url"])
 					elif "rottentomatoes" in document["url"]:
 						ScrapingRottenTomatoes(document["html"], scrapercollection)	
 			except:
