@@ -104,21 +104,24 @@ def ScrapingRottenTomatoes(html, scrapercollection, url):
 def main():
 	client = MongoClient()
 	db = client.crawlerdb
-	#crawlercollection = db.crawlercollection
-	crawlercollection = db.mycollection
+	crawlercollection = db.crawlercollection
 	scrapercollection = db.scrapercollection
+	log = open('log.txt', 'w')
 	while True:
-		document = crawlercollection.find_one({"read" : None})
+		document = crawlercollection.find_one({"readed" : None})
 		if document:
 			try:
-				if not "showtimes" in document["url"] and not "reviews" in document["url"]:
-					if "imdb" in document["url"]:
-						ScrapingIMDB(document["html"], scrapercollection, document["url"])
-					elif "rottentomatoes" in document["url"]:
-						ScrapingRottenTomatoes(document["html"], scrapercollection, document["url"])	
+				if "imdb" in document["url"]:
+					success = ScrapingIMDB(document["html"], scrapercollection, document["url"])
+				elif "rottentomatoes" in document["url"]:
+					success = ScrapingRottenTomatoes(document["html"], scrapercollection, document["url"])
+				if not success:
+					document["invalid"] = True
+					log.write('El url ' + document["url"] + ' no pudo ser procesado. \n')					
 			except:
 				document["invalid"] = True
-			document["read"] = True
+				log.write('El url ' + document["url"] + ' no pudo ser procesado. \n')
+			document["readed"] = True
 			crawlercollection.save(document)
 		else:
 			time.sleep(10)
