@@ -39,7 +39,7 @@ def ScrapingIMDB(html, scrapercollection, url):
 							error = True
 						if not error:
 							if soup.find("div", {"class": "image"}):
-								image = soup.find("div", {"class": "image"})['src']
+								image = soup.find("div", {"class": "image"}).find('img')['src']
 							else:
 								error = True
 							if not error:
@@ -51,35 +51,55 @@ def ScrapingIMDB(html, scrapercollection, url):
 									actores.append(actor.a.span.contents[0].strip())
 								movie = {"Title": title, "Year": year, "Rating": rating, "Genres": generos, "Synopsis": synopsis, "Cast": actores, "Site" : 'IMDB', "Image" : image, "URL" : url}
 								scrapercollection.insert(movie)
-	if error:
-		return False
-	else:
-		return True
+	return not error
 
-def ScrapingRottenTomatoes(html, scrapercollection):
+def ScrapingRottenTomatoes(html, scrapercollection, url):
+	error = False
 	soup = BeautifulSoup(BeautifulSoup(html).prettify())
 	titleTag = soup.find("span", {"itemprop": "name"})
-	if not titleTag:
+	if not titleTag and soup.find("h1", {"class": "movie_title"}).find_all("span"):
 	    titleTag = soup.find("h1", {"class": "movie_title"}).find_all("span")[0]
-	titleAux = titleTag.contents[0].strip()
-	title = titleAux[:len(titleAux)-7]
-	year = titleAux[len(titleAux)-5:len(titleAux)-1]
-	cast = soup.find("div", {"id": "cast-info"}).find_all(itemprop="name")
-	genres = soup.find("body").find_all(itemprop="genre")
-	synopsis = soup.find("p",{"id": "movieSynopsis"})
-	rating = soup.find("span",{"id": "all-critics-meter"})
-	if not rating:
-		rating = "No rating"
+	if titleTag:
+		titleAux = titleTag.contents[0].strip()
+		title = titleAux[:len(titleAux)-7]
+		year = titleAux[len(titleAux)-5:len(titleAux)-1]
 	else:
-		rating = rating.contents[0].strip()
-	generos = []
-	for genre in genres:
-	   generos.append(genre.contents[0].strip())
-	actores = []
-	for actor in cast:
-	    actores.append(actor.contents[0].strip())
-	movie = {"Title": title, "Year": year, "Rating RottenTomatoes": rating, "Genres": generos, "Synopsis RottenTomatoes": synopsis.contents[0].strip(), "Cast": actores, "Site" : 1}
-	scrapercollection.insert(movie)
+		error = True
+	if not error:
+		if soup.find("div", {"id": "cast-info"}).find_all(itemprop="name"):
+			cast = soup.find("div", {"id": "cast-info"}).find_all(itemprop="name")
+		else:
+			error = True
+		if not error:
+			if soup.find("body").find_all(itemprop="genre"):
+				genres = soup.find("body").find_all(itemprop="genre")
+			else:
+				error = True
+			if not error:
+				if soup.find("p",{"id": "movieSynopsis"}):
+					synopsis = soup.find("p",{"id": "movieSynopsis"}).contents[0].strip()
+				else:
+					error = True
+				if not error:
+					if soup.find("span",{"id": "all-critics-meter"}):
+						rating = soup.find("span",{"id": "all-critics-meter"}).contents[0].strip()
+					else:
+						error = True
+					if not error:
+						if soup.find("div", {"class": "media_block_image movie_poster_area"}):
+							image = soup.find("div", {"class": "media_block_image movie_poster_area"}).find('img')['src']
+						else:
+							error = True
+						if not error
+							generos = []
+							for genre in genres:
+							   generos.append(genre.contents[0].strip())
+							actores = []
+							for actor in cast:
+								actores.append(actor.contents[0].strip())
+							movie = {"Title": title, "Year": year, "Rating": rating, "Genres": generos, "Synopsis": synopsis, "Cast": actores, "Site" : 'RottenTomatoes', "Image" : image, "URL" : url}
+							scrapercollection.insert(movie)
+	return not error
 
 def main():
 	client = MongoClient()
@@ -95,7 +115,7 @@ def main():
 					if "imdb" in document["url"]:
 						ScrapingIMDB(document["html"], scrapercollection, document["url"])
 					elif "rottentomatoes" in document["url"]:
-						ScrapingRottenTomatoes(document["html"], scrapercollection)	
+						ScrapingRottenTomatoes(document["html"], scrapercollection, document["url"])	
 			except:
 				document["invalid"] = True
 			document["read"] = True
