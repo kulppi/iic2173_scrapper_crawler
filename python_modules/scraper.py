@@ -1,10 +1,10 @@
-from bs4 import BeautifulSoup
+import bs4
 from pymongo import MongoClient
 import time
 
 def ScrapingIMDB(html, scrapercollection, url):
 	status = "Success"
-	soup = BeautifulSoup(BeautifulSoup(html).prettify(), 'lxml')
+	soup = bs4.BeautifulSoup(bs4.BeautifulSoup(html).prettify(), 'lxml')
 	if not soup.find("div", {"id": "titleTVSeries"}) and not soup.find("div", {"id": "titleTVEpisodes"}):
 		titleTag = soup.find("span", {"class": "title-extra"})
 		if not titleTag and soup.find("h1", {"class": "header"}).find_all("span"):
@@ -53,12 +53,12 @@ def ScrapingIMDB(html, scrapercollection, url):
 									movie = {"Title": title, "Year": year, "Rating": rating, "Genres": generos, "Synopsis": synopsis, "Cast": actores, "Site" : 'IMDB', "Image" : image, "URL" : url}
 									scrapercollection.insert(movie)
 	else:
-		status = "Serie"
-	return status
+		status = "Serie"	
+		return status
 
 def ScrapingRottenTomatoes(html, scrapercollection, url):
 	status = "Success"
-	soup = BeautifulSoup(BeautifulSoup(html).prettify(), 'lxml')
+	soup = bs4.BeautifulSoup(bs4.BeautifulSoup(html).prettify(), 'lxml')
 	titleTag = soup.find("span", {"itemprop": "name"})
 	if not titleTag and soup.find("h1", {"class": "movie_title"}).find_all("span"):
 	    titleTag = soup.find("h1", {"class": "movie_title"}).find_all("span")[0]
@@ -102,7 +102,7 @@ def ScrapingRottenTomatoes(html, scrapercollection, url):
 								actores.append(actor.contents[0].strip())
 							movie = {"Title": title, "Year": year, "Rating": rating, "Genres": generos, "Synopsis": synopsis, "Cast": actores, "Site" : 'RottenTomatoes', "Image" : image, "URL" : url}
 							scrapercollection.insert(movie)
-	return status
+		return status
 
 def main():
 	client = MongoClient()
@@ -116,9 +116,13 @@ def main():
 		if document:
 			try:
 				if "imdb" in document["url"]:
+					print "IMDB"
 					status = ScrapingIMDB(document["html"], scrapercollection, document["url"])
+					print status
 				elif "rottentomatoes" in document["url"]:
+					print "RT"
 					status = ScrapingRottenTomatoes(document["html"], scrapercollection, document["url"])
+					print status
 				if status == "Fail":
 					document["invalid"] = True
 					log.write('El url ' + document["url"] + ' no pudo ser procesado. \n')
@@ -133,7 +137,6 @@ def main():
 			crawlercollection.save(document)
 		else:
 			time.sleep(10)
-
 
 if __name__ == '__main__':
 	main()
