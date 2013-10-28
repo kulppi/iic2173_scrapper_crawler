@@ -4,7 +4,7 @@ import time
 
 def ScrapingIMDB(html, scrapercollection, url):
 	status = "Success"
-	soup = BeautifulSoup(BeautifulSoup(html).prettify())
+	soup = BeautifulSoup(BeautifulSoup(html).prettify(), 'lxml')
 	if not soup.find("div", {"id": "titleTVSeries"}) and not soup.find("div", {"id": "titleTVEpisodes"}):
 		titleTag = soup.find("span", {"class": "title-extra"})
 		if not titleTag and soup.find("h1", {"class": "header"}).find_all("span"):
@@ -58,7 +58,7 @@ def ScrapingIMDB(html, scrapercollection, url):
 
 def ScrapingRottenTomatoes(html, scrapercollection, url):
 	status = "Success"
-	soup = BeautifulSoup(BeautifulSoup(html).prettify())
+	soup = BeautifulSoup(BeautifulSoup(html).prettify(), 'lxml')
 	titleTag = soup.find("span", {"itemprop": "name"})
 	if not titleTag and soup.find("h1", {"class": "movie_title"}).find_all("span"):
 	    titleTag = soup.find("h1", {"class": "movie_title"}).find_all("span")[0]
@@ -107,8 +107,9 @@ def ScrapingRottenTomatoes(html, scrapercollection, url):
 def main():
 	client = MongoClient()
 	db = client.crawlerdb
+	db2 = client.scraperdb
 	crawlercollection = db.crawlercollection
-	scrapercollection = db.scrapercollection
+	scrapercollection = db2.scrapercollection
 	log = open('log.txt', 'w')
 	while True:
 		document = crawlercollection.find_one({"readed" : None})
@@ -128,6 +129,7 @@ def main():
 				document["invalid"] = True
 				log.write('El url ' + document["url"] + ' no pudo ser procesado. \n')
 			document["readed"] = True
+			document["html"] = ""
 			crawlercollection.save(document)
 		else:
 			time.sleep(10)
