@@ -13,37 +13,37 @@ def ScrapingIMDB(html, scrapercollection, url):
 			title = titleTag.contents[0].strip().replace('\"','')
 		else:
 			status = "Fail"
-		if status == "Fail":	
+		if status == "Success":	
 			if soup.find("h1", {"class": "header"}).find("a"):
 				year = soup.find("h1", {"class": "header"}).find("a").contents[0].strip()
 			else:
 				status = "Fail"
-			if status == "Fail":
+			if status == "Success":
 				if soup.find("table", {"class": "cast_list"}).find_all(itemprop="actor"):
 					cast = soup.find("table", {"class": "cast_list"}).find_all(itemprop="actor")
 				else:
 					status = "Fail"
-				if status == "Fail":
+				if status == "Success":
 					if soup.find("div", {"class": "infobar"}).find_all(itemprop="genre"):
 						genres = soup.find("div", {"class": "infobar"}).find_all(itemprop="genre")
 					else:
 						status = "Fail"
-					if status == "Fail":
+					if status == "Success":
 						if soup.find("div",{"id": "titleStoryLine"}).find("div",{"itemprop":"description"}).find("p"):
 							synopsis = soup.find("div",{"id": "titleStoryLine"}).find("div",{"itemprop":"description"}).find("p").contents[0].strip()
 						else:
 							status = "Fail"
-						if status == "Fail":
+						if status == "Success":
 							if soup.find("div",{"class": "star-box-giga-star"}):
 								rating = soup.find("div",{"class": "star-box-giga-star"}).contents[0].strip()
 							else:
 								status = "Fail"
-							if status == "Fail":
+							if status == "Success":
 								if soup.find("div", {"class": "image"}):
 									image = soup.find("div", {"class": "image"}).find('img')['src']
 								else:
 									status = "Fail"
-								if status == "Fail":
+								if status == "Success":
 									generos = []
 									for genre in genres:
 										generos.append(genre.contents[0].strip())
@@ -68,32 +68,32 @@ def ScrapingRottenTomatoes(html, scrapercollection, url):
 		year = titleAux[len(titleAux)-5:len(titleAux)-1]
 	else:
 		status = "Fail"
-	if status == "Fail":
+	if status == "Success":
 		if soup.find("div", {"id": "cast-info"}).find_all(itemprop="name"):
 			cast = soup.find("div", {"id": "cast-info"}).find_all(itemprop="name")
 		else:
 			status = "Fail"
-		if status == "Fail":
+		if status == "Success":
 			if soup.find("div", {"class": "left_col"}).find_all(itemprop="genre"):
 				genres = soup.find("div", {"class": "left_col"}).find_all(itemprop="genre")
 			else:
 				status = "Fail"
-			if status == "Fail":
+			if status == "Success":
 				if soup.find("p",{"id": "movieSynopsis"}):
 					synopsis = soup.find("p",{"id": "movieSynopsis"}).contents[0].strip()
 				else:
 					status = "Fail"
-				if status == "Fail":
+				if status == "Success":
 					if soup.find("span",{"id": "all-critics-meter"}):
 						rating = soup.find("span",{"id": "all-critics-meter"}).contents[0].strip()
 					else:
 						status = "Fail"
-					if status == "Fail":
+					if status == "Success":
 						if soup.find("div", {"class": "media_block_image movie_poster_area"}):
 							image = soup.find("div", {"class": "media_block_image movie_poster_area"}).find('img')['src']
 						else:
 							status = "Fail"
-						if status == "Fail":
+						if status == "Success":
 							generos = []
 							for genre in genres:
 							   generos.append(genre.contents[0].strip())
