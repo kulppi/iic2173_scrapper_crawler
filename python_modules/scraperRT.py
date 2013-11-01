@@ -6,7 +6,7 @@ from pymongo import MongoClient
 def ScrapingRottenTomatoes(scrapercollection, url):
     req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     html = urlopen(req).read()
-    soup = bs4.BeautifulSoup(bs4.BeautifulSoup(html).prettify(), 'lxml')
+    soup = BeautifulSoup(BeautifulSoup(html).prettify())
     titleTag = soup.find("span", {"itemprop": "name"})
     if not titleTag:
         titleTag = soup.find("h1", {"class": "movie_title"}).find_all("span")[0]
