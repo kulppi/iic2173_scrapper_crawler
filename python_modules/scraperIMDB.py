@@ -29,9 +29,9 @@ def ScrapingIMDB(scrapercollection, url):
 
 def mainScraperIMDB():
     client = MongoClient()
-    db = client.crawlerdb
+    db1 = client.crawlerdb
     db2 = client.scraperdb
-    crawlercollection = db.imdb
+    crawlercollection = db1.imdb
     scrapercollection = db2.scrapercollection
     while True:
         document = crawlercollection.find_one({"readed" : None})
