@@ -1,4 +1,4 @@
-import requests
+#import requests
 from urllib import urlopen
 from bs4 import BeautifulSoup
 from pymongo import MongoClient
