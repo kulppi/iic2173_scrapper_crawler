@@ -1,16 +1,10 @@
-#import requests
 from urllib import urlopen
 from bs4 import BeautifulSoup
 from pymongo import MongoClient
 
 def ScrapingIMDB(scrapercollection, url):
-    #req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-    #print url
     html = urlopen(url).read()
-    #print 'ok'
     soup = BeautifulSoup(BeautifulSoup(html).prettify())
-    #print 'okImport'
-    #if not soup.find("div", {"id": "titleTVSeries"}) and not soup.find("div", {"id": "titleTVEpisodes"}):
     titleTag = soup.find("span", {"class": "title-extra"})
     if not titleTag:
         titleTag = soup.find("h1", {"class": "header"}).find_all("span")[0]
@@ -29,8 +23,6 @@ def ScrapingIMDB(scrapercollection, url):
         actores.append(actor.a.span.contents[0].strip())
     movie = {"Title": title, "Year": year, "Rating": rating, "Genres": generos, "Synopsis": synopsis, "Cast": actores, "Site" : 'IMDB', "Image" : image, "URL" : url}
     scrapercollection.insert(movie)
-    #print 'listo'
-    #print 'nolisto'
 
 def mainScraperIMDB():
     client = MongoClient()

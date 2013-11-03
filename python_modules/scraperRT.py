@@ -1,11 +1,10 @@
-import requests
-from urllib import urlopen
+import urllib2
 from bs4 import BeautifulSoup
 from pymongo import MongoClient
 
 def ScrapingRottenTomatoes(scrapercollection, url):
-    req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-    html = urlopen(req).read()
+    req = urllib2.Request(url, None, headers={'User-Agent': 'Mozilla/5.0'})
+    html = urllib2.urlopen(req).read()
     soup = BeautifulSoup(BeautifulSoup(html).prettify())
     titleTag = soup.find("span", {"itemprop": "name"})
     if not titleTag:
