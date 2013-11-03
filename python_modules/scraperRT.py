@@ -1,9 +1,4 @@
-<<<<<<< HEAD
 import urllib2
-=======
-#import requests
-from urllib import urlopen
->>>>>>> c8eb90dd192f1c363e58a3c6dc3fb2b337116eb8
 from bs4 import BeautifulSoup
 from pymongo import MongoClient
 
